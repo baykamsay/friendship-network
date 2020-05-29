@@ -18,5 +18,6 @@ int main() {
     F.listFriends("Ibrahim", 2);
     F.listFriends("Ibrahim", 3);
     cout << endl;
+    F.displayAverageDegrees();
     return 0;
 }

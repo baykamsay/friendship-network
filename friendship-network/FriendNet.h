@@ -38,6 +38,7 @@ private:
     // define private class functions here, if you have any
     int findPerson(const string personName);
     void listFriends(const int id, const int hopNo, int level, bool* visits);
+    int findComponent(const int id);
     // YOU HAVE TO USE THE ADJACENCY LIST REPRESENTATION
 };
 

@@ -7,6 +7,7 @@
 
 using namespace std;
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include "FriendNet.h"
 
@@ -106,9 +107,15 @@ void FriendNet::listFriends(const string personName, const int hopNo) {
             }
             listFriends(id, hopNo, 0, visits);
             visits[id] = false;
+            bool first = true;
             for (int i = 0; i < size; i++) {
-                if (visits[i])
-                    cout << ", " << people[i]->name;
+                if (visits[i]) {
+                    if (first)
+                        first = false;
+                    else
+                        cout << ", ";
+                    cout << people[i]->name;
+                }
             }
         }
         else {
@@ -129,19 +136,98 @@ int FriendNet::findPerson(const string personName) {
 
 void FriendNet::listFriends(const int id, const int hopNo, int level, bool* visits) {
     visits[id] = true;
-    cout << id << " ";
+    
     if (level == hopNo)
         return;
     
     if (people[id]->next != NULL) { // allow visits if their actual level is smaller by making the array an int
         
         FriendNode* cur = people[id]->next;
-        if (!visits[cur->id])
+        if (!visits[cur->id] || level < hopNo)
             listFriends(cur->id, hopNo, level + 1, visits);
         while (cur->next != NULL) {
             cur = cur->next;
-            if (!visits[cur->id])
+            if (!visits[cur->id] || level < hopNo)
                 listFriends(cur->id, hopNo, level + 1, visits);
         }
     }
+}
+
+void FriendNet::displayAverageDegrees() {
+    int numOfComponents = 0;
+    int* components = new int[size];
+    int* degrees = new int[size];
+
+    for (int i = 0; i < size; i++) {
+        components[i] = -1;
+    }
+    for (int i = 0; i < size; i++) {
+        degrees[i] = 0;
+    }
+
+    for (int i = 0; i < size; i++) {
+
+        if (components[i] == -1) {
+            components[i] = numOfComponents;
+            numOfComponents++;
+        }
+
+        int curComponent = components[i];
+        int compToCombine = -1;
+
+        for (FriendNode* cur = people[i]->next; cur != NULL; cur = cur->next) {
+            if (components[cur->id] != -1 && components[cur->id] != components[i]) {
+                compToCombine = components[cur->id];
+            }
+            components[cur->id] = components[i];
+        }
+
+        // get this and put this on the if statement above
+        if (compToCombine != -1) {
+            if (compToCombine > curComponent) {
+                int temp = compToCombine;
+                compToCombine = curComponent;
+                curComponent = temp;
+            }
+
+            for (int j = 0; j < size; j++) {
+                if (components[j] == curComponent)
+                    components[j] = compToCombine;
+            }
+            numOfComponents--;
+        }
+
+        for (FriendNode* cur = people[i]->next; cur != NULL; cur = cur->next) {
+            degrees[i]++;
+        }
+    }
+
+    double* avgDegrees = new double[numOfComponents];
+
+    for (int i = 0; i < numOfComponents; i++) {
+        int sum = 0;
+        int numOfVertices = 0;
+
+        for (int j = 0; j < size; j++) {
+            if (components[j] == i) {
+                sum += degrees[j];
+                numOfVertices++;
+            }
+        }
+        avgDegrees[i] = (double) sum / numOfVertices;
+    }
+
+    cout << "There are " << numOfComponents << " connected components. The average degrees are:" << endl;
+    cout << fixed << setprecision(2);
+    for (int i = 0; i < numOfComponents; i++) {
+        cout << "For component " << i << ": " << avgDegrees[i] << endl;
+    }
+
+    delete[] components;
+    delete[] degrees;
+    delete[] avgDegrees;
+}
+
+void FriendNet::displayDiameters() {
+    // to do
 }
