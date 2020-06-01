@@ -19,5 +19,8 @@ int main() {
     F.listFriends("Ibrahim", 3);
     cout << endl;
     F.displayAverageDegrees();
+    cout << endl;
+    F.displayDiameters();
+    cout << endl;
     return 0;
 }
